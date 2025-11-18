@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+    <p class="mt-1 text-sm text-gray-500">Track and manage all reported bugs in one place.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 gap-5 mt-6 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Total Bugs -->
+    <div class="p-5 bg-white rounded-lg shadow">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                <i class="fas fa-bug text-xl"></i>
+            </div>
+            <div class="ml-5">
+                <h4 class="text-2xl font-semibold text-gray-700">{{ bugs|length }}</h4>
+                <div class="text-gray-500">Total Bugs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Open Bugs -->
+    <div class="p-5 bg-white rounded-lg shadow">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                <i class="fas fa-exclamation-circle text-xl"></i>
+            </div>
+            <div class="ml-5">
+                <h4 class="text-2xl font-semibold text-gray-700">{{ bugs|selectattr('status', 'equalto', 'Open')|list|length }}</h4>
+                <div class="text-gray-500">Open</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- In Progress -->
+    <div class="p-5 bg-white rounded-lg shadow">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                <i class="fas fa-spinner text-xl"></i>
+            </div>
+            <div class="ml-5">
+                <h4 class="text-2xl font-semibold text-gray-700">{{ bugs|selectattr('status', 'equalto', 'In Progress')|list|length }}</h4>
+                <div class="text-gray-500">In Progress</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Closed Bugs -->
+    <div class="p-5 bg-white rounded-lg shadow">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                <i class="fas fa-check-circle text-xl"></i>
+            </div>
+            <div class="ml-5">
+                <h4 class="text-2xl font-semibold text-gray-700">{{ bugs|selectattr('status', 'equalto', 'Closed')|list|length }}</h4>
+                <div class="text-gray-500">Closed</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Actions -->
+<div class="flex flex-col mt-8 sm:flex-row sm:items-center sm:justify-between">
+    <h2 class="text-xl font-semibold text-gray-900">All Bugs</h2>
+    <div class="flex items-center mt-4 space-x-3 sm:mt-0">
+        <div class="flex space-x-2">
+            <a href="{{ url_for('new_bug') }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="mr-2 fas fa-plus"></i> New Bug
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Bug List -->
+<div class="mt-6 overflow-hidden bg-white shadow sm:rounded-md">
+    <ul class="divide-y divide-gray-200">
+        {% if bugs %}
+            {% for bug in bugs %}
+            <li class="bug-status-{{ bug.status.lower().replace(' ', '-') }}">
+                <a href="{{ url_for('view_bug', bug_id=bug.id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-blue-600 truncate">{{ bug.title }}</p>
+                            <div class="flex flex-shrink-0 ml-2">
+                                <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full 
+                                    {% if bug.priority == 'High' %}bg-red-100 text-red-800
+                                    {% elif bug.priority == 'Medium' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-green-100 text-green-800{% endif %}">
+                                    {{ bug.priority }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-2 sm:flex sm:justify-between">
+                            <div class="sm:flex">
+                                <p class="flex items-center text-sm text-gray-500">
+                                    <i class="mr-1.5 fas fa-user"></i>
+                                    {{ bug.reporter.username }}
+                                </p>
+                                {% if bug.assignee %}
+                                <p class="flex items-center mt-2 text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                                    <i class="mr-1.5 fas fa-user-tag"></i>
+                                    {{ bug.assignee.username }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center mt-2 text-sm text-gray-500 sm:mt-0">
+                                <i class="mr-1.5 far fa-clock"></i>
+                                <p>Last updated: {{ bug.updated_at.strftime('%b %d, %Y %H:%M') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        {% else %}
+            <li class="px-4 py-12 text-center">
+                <i class="mx-auto text-4xl text-gray-400 fas fa-inbox"></i>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No bugs found</h3>
+                <p class="mt-1 text-sm text-gray-500">Get started by creating a new bug report.</p>
+                <div class="mt-6">
+                    <a href="{{ url_for('new_bug') }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="mr-2 -ml-1 fas fa-plus"></i> New Bug
+                    </a>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}

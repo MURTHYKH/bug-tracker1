@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bug.title }}{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                {{ bug.title }}
+                <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    {% if bug.priority == 'High' %}bg-red-100 text-red-800
+                    {% elif bug.priority == 'Medium' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ bug.priority }}
+                </span>
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Reported by {{ bug.reporter.username }} on {{ bug.created_at.strftime('%b %d, %Y') }}
+            </p>
+        </div>
+        <div class="flex space-x-2">
+            <a href="{{ url_for('index') }}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-arrow-left mr-1"></i> Back
+            </a>
+        </div>
+    </div>
+    
+    <div class="border-t border-gray-200">
+        <dl>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <form action="{{ url_for('update_bug', bug_id=bug.id) }}" method="POST" class="flex items-center">
+                        <select name="status" onchange="this.form.submit()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option value="Open" {% if bug.status == 'Open' %}selected{% endif %}>Open</option>
+                            <option value="In Progress" {% if bug.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                            <option value="Closed" {% if bug.status == 'Closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                    </form>
+                </dd>
+            </div>
+            
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Assigned To</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <form action="{{ url_for('update_bug', bug_id=bug.id) }}" method="POST" class="flex items-center">
+                        <select name="assignee_id" onchange="this.form.submit()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option value="">Unassigned</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}" {% if bug.assignee_id == user.id %}selected{% endif %}>
+                                    {{ user.username }}{% if user.is_admin %} (Admin){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </dd>
+            </div>
+            
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Priority</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <form action="{{ url_for('update_bug', bug_id=bug.id) }}" method="POST" class="flex items-center">
+                        <select name="priority" onchange="this.form.submit()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option value="Low" {% if bug.priority == 'Low' %}selected{% endif %}>Low</option>
+                            <option value="Medium" {% if bug.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="High" {% if bug.priority == 'High' %}selected{% endif %}>High</option>
+                        </select>
+                    </form>
+                </dd>
+            </div>
+            
+            <div class="bg-white px-4 py-5 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Description</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                    <div class="prose max-w-none">
+                        {{ bug.description|replace('\n', '<br>')|safe }}
+                    </div>
+                </dd>
+            </div>
+            
+            <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between items-center text-sm text-gray-500">
+                <div>
+                    <span class="font-medium">Created:</span> {{ bug.created_at.strftime('%b %d, %Y %H:%M') }}
+                    {% if bug.updated_at != bug.created_at %}
+                        <span class="ml-4">
+                            <span class="font-medium">Last Updated:</span> {{ bug.updated_at.strftime('%b %d, %Y %H:%M') }}
+                        </span>
+                    {% endif %}
+                </div>
+                {% if current_user.is_admin or current_user.id == bug.reporter_id %}
+                <form action="{{ url_for('delete_bug', bug_id=bug.id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this bug? This action cannot be undone.');">
+                    <button type="submit" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash-alt"></i> Delete Bug
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}

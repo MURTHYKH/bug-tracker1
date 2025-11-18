@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Report New Bug{% endblock %}
+
+{% block content %}
+<div class="md:grid md:grid-cols-4 md:gap-6">
+    <div class="md:col-span-1">
+        <div class="px-4 sm:px-0">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Report a New Bug</h3>
+            <p class="mt-1 text-sm text-gray-600">
+                Provide detailed information about the bug you've encountered. The more details you can provide, the easier it will be to resolve.
+            </p>
+            <div class="mt-6">
+                <h4 class="text-sm font-medium text-gray-900">Tips for a good bug report:</h4>
+                <ul class="mt-2 text-sm text-gray-600 list-disc pl-5 space-y-1">
+                    <li>Be specific and concise in the title</li>
+                    <li>Include steps to reproduce the issue</li>
+                    <li>Describe the expected vs actual behavior</li>
+                    <li>Add any relevant error messages</li>
+                    <li>Specify the environment (browser, OS, etc.)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-5 md:mt-0 md:col-span-3">
+        <form action="{{ url_for('new_bug') }}" method="POST">
+            <div class="shadow sm:rounded-md sm:overflow-hidden">
+                <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title *</label>
+                        <div class="mt-1">
+                            <input type="text" name="title" id="title" required
+                                   class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2"
+                                   placeholder="Briefly describe the issue">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">
+                            A clear and concise title that summarizes the problem.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description *</label>
+                        <div class="mt-1">
+                            <textarea id="description" name="description" rows="8" required
+                                      class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2"
+                                      placeholder="## Steps to reproduce\n1. First step\n2. Second step\n3. ...\n\n## Expected behavior\nWhat you expected to happen\n\n## Actual behavior\nWhat actually happened\n\n## Additional information\nAny other relevant information"></textarea>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">
+                            Detailed information about the bug. You can use Markdown for formatting.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="col-span-3 sm:col-span-1">
+                            <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                            <select id="priority" name="priority" 
+                                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <a href="{{ url_for('index') }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-bug mr-2"></i> Report Bug
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Simple markdown preview (can be enhanced with a proper markdown editor)
+    document.addEventListener('DOMContentLoaded', function() {
+        const description = document.getElementById('description');
+        if (description) {
+            // Add an event listener if you want to implement live preview
+            // description.addEventListener('input', updatePreview);
+        }
+    });
+    
+    function updatePreview() {
+        // Implement markdown preview if needed
+    }
+</script>
+{% endblock %}

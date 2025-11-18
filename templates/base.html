@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Tracker - {% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: calc(100vh - 4rem);
+        }
+        .bug-status-open { @apply bg-yellow-100 border-l-4 border-yellow-500; }
+        .bug-status-in-progress { @apply bg-blue-100 border-l-4 border-blue-500; }
+        .bug-status-closed { @apply bg-green-100 border-l-4 border-green-500; }
+        .priority-high { @apply bg-red-100 text-red-800; }
+        .priority-medium { @apply bg-yellow-100 text-yellow-800; }
+        .priority-low { @apply bg-green-100 text-green-800; }
+        .flash-message { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="flex items-center">
+                        <i class="fas fa-bug text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">Bug Tracker</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    {% if current_user.is_authenticated %}
+                        <span class="mr-4">Welcome, {{ current_user.username }}</span>
+                        <a href="{{ url_for('new_bug') }}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded mr-2">
+                            <i class="fas fa-plus mr-1"></i> New Bug
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded mr-2">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                            <i class="fas fa-user-plus mr-1"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-8">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            &copy; 2023 Bug Tracker. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.5s';
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
