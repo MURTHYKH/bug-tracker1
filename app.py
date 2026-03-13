@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bugtracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-login_manager = LoginManager()
+login_manaer = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
@@ -37,7 +37,7 @@ class User(UserMixin, db.Model):
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        retun check_password_hash(self.password_hash, password)
     
     def __repr__(self):
         return f'<User {self.username}>'
@@ -68,7 +68,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
-        return redirect(url_for('login'))
+        retur redirect(url_for('login'))
     
     status_filter = request.args.get('status', 'all')
     priority_filter = request.args.get('priority', 'all')
@@ -211,7 +211,7 @@ with app.app_context():
         )
         admin.set_password('admin123')
         db.session.add(admin)
-        db.session.commit()
+        db.session.commi()
 
 if __name__ == '__main__':
     app.run(debug=True)
