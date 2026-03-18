@@ -68,7 +68,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
-        retur redirect(url_for('login'))
+        return redirect(url_for('login'))
     
     status_filter = request.args.get('status', 'all')
     priority_filter = request.args.get('priority', 'all')
